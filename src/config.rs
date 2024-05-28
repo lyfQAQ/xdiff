@@ -4,6 +4,8 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use tokio::fs;
 use url::Url;
+
+use crate::ExtraArgs;
 /*
     yaml字段结构体的定义
 */
@@ -60,11 +62,13 @@ impl DiffConfig {
 }
 
 impl DiffProfile {
-    pub async fn diff(&self, args: DiffArgs) -> Result<String> {
+    pub async fn diff(&self, _args: ExtraArgs) -> Result<String> {
         // let res1 = req1.send(&args).await?;
         // let res2 = req2.send(args).await?;
         // let text1 = res1.filter_text(&self.response).await?;
         // let text2 = res2.filter_text(&self.response).await?;
-        todo!()
+        println!("{:?}", self);
+        println!("{:?}", _args);
+        Ok("".to_string())
     }
 }

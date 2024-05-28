@@ -1,7 +1,6 @@
-pub(crate) mod cli;
+pub mod cli;
 mod config;
-pub use config::{DiffArgs, DiffConfig, DiffProfile, RequestProfile, ResponseProfile};
-
+pub use config::{DiffConfig, DiffProfile, RequestProfile, ResponseProfile};
 #[derive(Debug, Clone)]
 pub struct ExtraArgs {
     pub headers: Vec<(String, String)>,

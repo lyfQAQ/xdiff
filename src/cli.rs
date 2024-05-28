@@ -1,26 +1,25 @@
 use anyhow::{anyhow, Result};
 use clap::{Parser, Subcommand};
-use console::Key;
-use reqwest::header;
 
 use crate::ExtraArgs;
 
 /// Diff two http requests and compare the difference of the responses
 #[derive(Debug, Parser)]
 #[clap(version, author, about, long_about = None)]
-pub(crate) struct Args {
+pub struct Args {
     #[clap(subcommand)]
     pub action: Action,
 }
 
 #[derive(Debug, Subcommand)]
-pub(crate) enum Action {
+#[non_exhaustive]
+pub enum Action {
     /// Diff two API responses based on given profile
     Run(RunArgs),
 }
 
 #[derive(Debug, Parser)]
-pub(crate) struct RunArgs {
+pub struct RunArgs {
     /// profile name
     #[clap(short, long, value_parser)]
     pub profile: String,
@@ -29,18 +28,22 @@ pub(crate) struct RunArgs {
     /// For headers, use `-e %key=val`
     /// For body, use `-e @key=val`
     #[clap(short, long, value_parser = parse_key_val, number_of_values = 1)]
-    extra_params: Vec<KeyVal>,
+    pub extra_params: Vec<KeyVal>,
+
+    /// Configuration to use
+    #[clap(short, long, value_parser)]
+    pub config: Option<String>,
 }
 
 #[derive(Debug, Clone)]
-pub(crate) enum KeyValType {
+pub enum KeyValType {
     Query,
     Header,
     Body,
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct KeyVal {
+pub struct KeyVal {
     key_type: KeyValType,
     key: String,
     value: String,
@@ -50,11 +53,13 @@ pub(crate) struct KeyVal {
 fn parse_key_val(s: &str) -> Result<KeyVal> {
     let mut parts = s.splitn(2, '=');
     let retrieve = |v: Option<&str>| -> Result<String> {
-        Ok(v.ok_or_else(|| anyhow!("Invalid key value pair: {}", s))?.trim().to_string())
-    }
+        Ok(v.ok_or_else(|| anyhow!("Invalid key value pair: {}", s))?
+            .trim()
+            .to_string())
+    };
     let key = retrieve(parts.next())?;
     let value = retrieve(parts.next())?;
-    
+
     let (key_type, key) = match key.chars().next() {
         Some('%') => (KeyValType::Header, key.chars().skip(1).collect::<String>()),
         Some('@') => (KeyValType::Body, key.chars().skip(1).collect::<String>()),
@@ -65,10 +70,9 @@ fn parse_key_val(s: &str) -> Result<KeyVal> {
     Ok(KeyVal {
         key_type,
         key,
-        value
+        value,
     })
 }
-
 
 impl From<Vec<KeyVal>> for ExtraArgs {
     fn from(args: Vec<KeyVal>) -> Self {
@@ -85,7 +89,7 @@ impl From<Vec<KeyVal>> for ExtraArgs {
         Self {
             headers,
             query,
-            body
+            body,
         }
     }
 }
