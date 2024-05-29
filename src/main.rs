@@ -19,7 +19,6 @@ async fn main() -> Result<()> {
 async fn run(args: RunArgs) -> Result<()> {
     let config_file = args.config.unwrap_or_else(|| "./xdiff.yml".to_string());
     let config = DiffConfig::load_yaml(&config_file).await?;
-
     let profile = config.get_profile(&args.profile).ok_or_else(|| {
         anyhow::anyhow!(
             "Profile {} not found in config file {}",

@@ -1,11 +1,8 @@
+use crate::{ExtraArgs, RequestProfile};
 use anyhow::Result;
-use reqwest::{header::HeaderMap, Method};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use tokio::fs;
-use url::Url;
-
-use crate::ExtraArgs;
 /*
     yaml字段结构体的定义
 */
@@ -20,24 +17,6 @@ pub struct DiffProfile {
     pub request1: RequestProfile,
     pub request2: RequestProfile,
     pub response: ResponseProfile,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct RequestProfile {
-    #[serde(with = "http_serde::method", default)]
-    pub method: Method,
-    pub url: Url,
-    // https://serde.rs/attr-skip-serializing.html
-    #[serde(skip_serializing_if = "Option::is_none", default /*不设置函数，使用std中的Default，= "default_params"*/)]
-    pub params: Option<serde_json::Value>,
-    #[serde(
-        with = "http_serde::header_map",
-        skip_serializing_if = "HeaderMap::is_empty",
-        default
-    )]
-    pub headers: HeaderMap,
-    #[serde(skip_serializing_if = "Option::is_none", default)]
-    pub body: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -63,12 +42,12 @@ impl DiffConfig {
 
 impl DiffProfile {
     pub async fn diff(&self, _args: ExtraArgs) -> Result<String> {
-        // let res1 = req1.send(&args).await?;
-        // let res2 = req2.send(args).await?;
-        // let text1 = res1.filter_text(&self.response).await?;
+        let res1 = self.request1.send(&_args).await?;
+        let res2 = self.request2.send(&_args).await?;
+
+        let text1 = res2.filter_text(&self.response).await?;
         // let text2 = res2.filter_text(&self.response).await?;
-        println!("{:?}", self);
-        println!("{:?}", _args);
+        println!("{}", text1);
         Ok("".to_string())
     }
 }

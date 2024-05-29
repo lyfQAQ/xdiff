@@ -1,6 +1,9 @@
 pub mod cli;
 mod config;
-pub use config::{DiffConfig, DiffProfile, RequestProfile, ResponseProfile};
+mod req;
+pub use config::{DiffConfig, DiffProfile, ResponseProfile};
+pub use req::RequestProfile;
+
 #[derive(Debug, Clone)]
 pub struct ExtraArgs {
     pub headers: Vec<(String, String)>,
