@@ -18,10 +18,11 @@ impl ResponseExt {
     pub async fn filter_text(self, profile: &ResponseProfile) -> Result<String> {
         let mut output = String::new();
         let headers = self.0.headers().clone();
-        output.push_str(&format!("{:?} {}\r", self.0.version(), self.0.status()));
-        for header in headers.iter() {
-            if !profile.skip_headers.contains(&header.0.to_string()) {
-                output.push_str(&format!("{}: {}\r", header.0, header.1.to_str()?))
+        output.push_str(&format!("{:?} {}\n", self.0.version(), self.0.status()));
+
+        for (k, v) in headers.iter() {
+            if !profile.skip_headers.contains(&k.to_string()) {
+                output.push_str(&format!("{}: {}\r", k, v.to_str()?))
             }
         }
 

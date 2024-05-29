@@ -45,9 +45,9 @@ impl DiffProfile {
         let res1 = self.request1.send(&_args).await?;
         let res2 = self.request2.send(&_args).await?;
 
-        let text1 = res2.filter_text(&self.response).await?;
-        // let text2 = res2.filter_text(&self.response).await?;
-        println!("{}", text1);
+        let text1 = res1.filter_text(&self.response).await?;
+        let text2 = res2.filter_text(&self.response).await?;
+        crate::utils::diff_text(&text1, &text2)?;
         Ok("".to_string())
     }
 }
